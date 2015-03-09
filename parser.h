@@ -79,9 +79,7 @@ typedef	struct ipv4_h
 }ipv4_h;
 
 
-// link layer codes
-const u_char arp[] =  {0x08, 0x06};
-const u_char ipv4[] =  {0x08, 0x00};
+
 
 
 void parse_eth(u_char * data){
@@ -109,6 +107,10 @@ void parse_eth(u_char * data){
 
 		if ( memcmp(hdr->eth_type, ipv4, 2) == 0 ){
 			printf("  Got IPv4 packet!\n");
+			ipv4_h * ip = data[14];
+			printf("Source IP: ");
+			print_ip(&ip->src_ip_addr);
+			printf("\n");
 		}
 
 	

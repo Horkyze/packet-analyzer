@@ -1,8 +1,12 @@
+#ifndef FUNSTIONS_H
+#define FUNSTIONS_H
+
+
 int is_print(u_char c){
 	return (c > 31 && c <= 127);
 }
 
-void print(u_char * data, int len){
+void print_hex(u_char * data, int len){
 	int i;
 	for (i = 0; i < len; ++i)
 	{
@@ -11,16 +15,13 @@ void print(u_char * data, int len){
 	printf("\n");
 }
 
-void print_hex(const char *s)
-{
-  while(*s)
-    printf("%02x", (unsigned int) *s++);
-}
+
 
 
 void dump(const unsigned char * p, int len){
 	int i, k = 0;
 	u_char buff[17];
+	memset(buff, 0, 17);
 	for (i = 1; i < len + 1; ++i)
 	{
 		printf("%02x ", p[i-1]);
@@ -43,3 +44,76 @@ void dump(const unsigned char * p, int len){
 	}
 	printf("\n\n");
 }
+
+void print_ip(u_char * data){
+	int i;
+	for (i = 0; i < 4; ++i){
+		printf("%u", data[i]);
+		if (i < 3){
+			printf(".");
+		}
+	}
+
+}
+
+/*===================================
+=            Linked List            =
+===================================*/
+
+typedef struct LL {
+	void * head;
+	unsigned int number_of_items;
+
+}LL;
+
+typedef struct Item {
+	unsigned int index;
+	void * data;
+	struct Item * next;
+}Item;
+
+LL * LL_init(){
+	LL * ll = malloc(sizeof(LL));
+	ll->head = 0;
+	ll->number_of_items = 0;
+	return ll;
+}
+
+Item * LL_add(LL * ll, void * data){
+	Item * item = malloc(sizeof(Item));
+	item->data = data;
+	item->next = 0;
+	ll->number_of_items++;
+
+	if (ll->head == 0){
+		ll->head = item;
+		item->index = 1;
+		return item;
+	}
+
+	Item * curr = ll->head;
+	int i = 0;
+	while(curr->next != 0) {
+	    curr = curr->next;
+	    i++;
+	}
+	curr->next = item;
+	
+	
+	
+	item->index = ll->number_of_items;
+	return item;
+}
+
+void LL_print(LL * ll){
+	Item * curr = ll->head;
+	while(curr) {
+	    printf("Item index %i: data_p: %p next_p: %p \n", curr->index, curr->data, curr->next);
+	    curr = curr->next;
+	}
+}
+
+/*-----  End of Linked List  ------*/
+
+
+#endif

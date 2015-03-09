@@ -17,7 +17,9 @@
 
 // custom includes
 #include "functions.h"
-#include "parser.h"
+#include "hash_table.h"
+#include "eth_parser.h"
+
 
 
 void print_usage(){
@@ -68,15 +70,12 @@ int main(int argc, char *argv[])
 		mask = 0;
 	}
 
-	if (file)
-    {
-    	 handle = pcap_open_offline(file, errbuf); 
-    } else if (interface)
-    {
+	if (file){
+    	handle = pcap_open_offline(file, errbuf); 
+    } else if (interface){
     	/* Open the session in promiscuous mode */
     	handle = pcap_open_live(dev, BUFSIZ, 1, 1000, errbuf);
     }
-
 	
 	if (handle == NULL) {
 		fprintf(stderr, "Couldn't open device %s: %s\n", "somedev", errbuf);
@@ -95,21 +94,20 @@ int main(int argc, char *argv[])
 	int packet_number = 1;
 	while(1){
 
-	
-		/* Grab a packet */
 		packet = pcap_next(handle, &header);
 		if ( packet == NULL){
-			continue;
+			break;
 		} else {
 		
-			printf("Packet #%iJacked a packet with length of [%d]\n", packet_number++, header.len);
-			
-			dump(packet, header.len);
-			parse_eth(packet);
+			//printf("\n---------------------------------------------------------------------\nPacket #%i, length [%d]\n\n", packet_number++, header.len);
+			add_frame(packet, header.len);
+			//dump(packet, header.len);
+			//parse_eth(packet);
 		}
 		
 	}
-
+	//LL_print(frames_ll);
+	print_frames();
 	printf("Total parsed: %i packets.\n", packet_number);
 	pcap_close(handle);
 	return(0);
