@@ -10,6 +10,7 @@
 
 
 #include <pcap.h>
+#include <arpa/inet.h>
 #include <getopt.h>
 #include "stdio.h"
 #include "string.h"
@@ -19,6 +20,7 @@
 #include "functions.h"
 #include "hash_table.h"
 #include "eth_parser.h"
+#include "ip_parser.h"
 
 
 
@@ -97,17 +99,14 @@ int main(int argc, char *argv[])
 		packet = pcap_next(handle, &header);
 		if ( packet == NULL){
 			break;
-		} else {
-		
-			//printf("\n---------------------------------------------------------------------\nPacket #%i, length [%d]\n\n", packet_number++, header.len);
+		} else {		
 			add_frame(packet, header.len);
-			//dump(packet, header.len);
-			//parse_eth(packet);
 		}
 		
 	}
-	//LL_print(frames_ll);
+
 	print_frames();
+	parse_packets();
 	printf("Total parsed: %i packets.\n", packet_number);
 	pcap_close(handle);
 	return(0);

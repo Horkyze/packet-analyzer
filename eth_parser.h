@@ -3,11 +3,11 @@
 =======================================*/
 
 
-
-
-
-
 /*==========  Variables / Constants  ==========*/
+
+#define ARP_TYPE 0x0608 // 0x8060 -> 0x0608 due to endianness 
+#define IP4_TYPE 0x0080 // 0x0800 -> 0x0080 due to endianness 
+
 
 const u_char eth_max[] = {0x06, 0x00}; // 1536 
 
@@ -27,9 +27,9 @@ typedef	struct eth_2_h
 {
 	u_char dst_addr[6];
 	u_char src_addr[6];
-	u_char eth_type[2];
+	u_short eth_type;
 	u_char extra[2]; // just for parsing purposes
-}Eth_II_hdr;
+}eth_2_h;
 
 typedef	struct eth_raw_h
 {
@@ -66,6 +66,11 @@ typedef	struct eth_llc_snap_h
 
 /*-----  End of Ethernet Header Declaration  ------*/
 
+u_short get_eth_type(eth_2_h * h){
+	
+	return h->eth_type;
+}
+
 
 void parse_eth(u_char * data, int length, int index){
 
@@ -80,17 +85,21 @@ void parse_eth(u_char * data, int length, int index){
 	printf("Src Addr : "); 
 	print_hex(hdr->src_addr, 6);
 
-	printf("Length / type : "); 
-	print_hex(hdr->eth_type, 2);
+	printf("Length pcap:      %i bytes\n", length); 
+	printf("Length transport: %i bytes\n", (length < 60)? 64 : length+4); 
+	
 
+	printf("Length / type : %x", get_eth_type(hdr)); 
 
-	int k = memcmp(hdr->eth_type, eth_max, 2);
+	if (get_eth_type(hdr) == ARP_TYPE){
+		printf("ARP!!!\n");
+	}
+
+	int k = memcmp(&(hdr->eth_type), eth_max, 2);
 	//printf("cmp: %i\n", k);
 	if ( k >= 0){
 		
 		printf("Ethernet II\n");
-
-
 
 	
 	} else {
@@ -108,15 +117,13 @@ void parse_eth(u_char * data, int length, int index){
 	dump(data, length);
 }
 
-
-
-
-
-
 typedef struct Frame {
-	unsigned int number;
-	unsigned int length;
+	u_int number;
+	u_int length;
+
 	void * eth_header;
+	void * network_header;
+	void * transport_header;
 	void * data;
 } Frame;
 
@@ -129,10 +136,13 @@ void add_frame(u_char * data, int length){
 	Frame * frame = malloc(sizeof(Frame));
 	frame->length = length;
 	frame->data = malloc(length);
+	frame->eth_header = frame->data;
 	memcpy ( frame->data, data, length);
 	frame->number = frames_ll->number_of_items+1;
 	LL_add(frames_ll, frame);
 }
+
+
 
 void print_frames(){
 	int i = 0;
@@ -140,7 +150,6 @@ void print_frames(){
 	Item * curr;
 	curr = frames_ll->head;
 	while(curr) {
-	
 		
 		f = curr->data;
 		parse_eth(f->data, f->length, f->number);

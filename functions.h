@@ -45,16 +45,7 @@ void dump(const unsigned char * p, int len){
 	printf("\n\n");
 }
 
-void print_ip(u_char * data){
-	int i;
-	for (i = 0; i < 4; ++i){
-		printf("%u", data[i]);
-		if (i < 3){
-			printf(".");
-		}
-	}
 
-}
 
 /*===================================
 =            Linked List            =
