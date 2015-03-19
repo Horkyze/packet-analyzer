@@ -1,6 +1,12 @@
 A simple packet analyzer utility using pcap library.
 
-Run ./build to create a binary inside bin folder.
+Run 
+$ make 
+to create a binary inside bin folder.
+
+Optionaly run
+$ make debug
+to open gdb
 
 Example:
 

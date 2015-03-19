@@ -51,7 +51,7 @@ void parse_packets(){
 		
 
 		//printf("\t: %u bytes\n", );
-		insert_h(ht, IPv4->src_ip_addr, 10);
+		//insert_h(ht, IPv4->src_ip_addr, 10);
 		
 	    curr = curr->next; // next item in LL
 	}

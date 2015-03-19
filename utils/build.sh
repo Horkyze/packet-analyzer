@@ -1,4 +1,4 @@
 #!/bin/bash
 
-clang -lpcap -g main.c -o ../bin/analyzer 
+clang -lpcap -g ../main.c -o ../bin/analyzer 
 

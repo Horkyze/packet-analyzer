@@ -1,1 +1,1 @@
-r -f ../capture/trace-1.pcap
+r -f capture/trace-1.pcap
