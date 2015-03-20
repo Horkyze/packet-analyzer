@@ -3,9 +3,6 @@
 	Created as a school assigment for Computer Networks curse.
 	Matej Bellus
 
-	TODO:
-	- APP layer parser
-
 **/
 
 
@@ -107,7 +104,7 @@ int main(int argc, char *argv[])
 
 	print_frames();
 	parse_packets();
-	printf("Total parsed: %i packets.\n", packet_number);
+	
 	pcap_close(handle);
 	return(0);
 }

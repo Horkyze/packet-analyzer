@@ -1,4 +1,11 @@
+// macro for referencing ipv4 header
 #define IPv4 ((ipv4_h*)f->network_header)
+
+// macro for referencing eth II header
+#define EthII ((eth_2_h*)f->eth_header)
+
+// Hash table size
+#define HT_SIZE (frames_ll->number_of_items*3)
 
 typedef	struct ipv4_h
 {
@@ -16,6 +23,20 @@ typedef	struct ipv4_h
 
 }ipv4_h;
 
+#define ARP_REQUEST 1   /* ARP Request             */ 
+#define ARP_REPLY 2     /* ARP Reply               */ 
+typedef struct arp_h { 
+    u_int16_t htype;    /* Hardware Type           */ 
+    u_int16_t ptype;    /* Protocol Type           */ 
+    u_char hlen;        /* Hardware Address Length */ 
+    u_char plen;        /* Protocol Address Length */ 
+    u_int16_t oper;     /* Operation Code          */ 
+    u_char sha[6];      /* Sender hardware address */ 
+    u_int spa[4];      	/* Sender IP address       */ 
+    u_char tha[6];      /* Target hardware address */ 
+    u_int tpa[4];      	/* Target IP address       */ 
+}arp_h; 
+
 
 char * ip_to_string(u_int ip){
 	char * s;
@@ -29,30 +50,71 @@ char * ip_to_string(u_int ip){
     return s;      
 }
 
-// create packets linked list 
+// prints all ip addrs from hash table
+void print_all_h(Hash_table * ht){
+	int i;
+
+	for (i = 0; i < ht->n; ++i){
+		if ( (ht->table[i]).ip != 0){
+			printf("Src ip: %s \t bytes send: %u\n", ip_to_string(ht->table[i].ip), ht->table[i].bytes_send);
+		}
+	}
+}
+
+void print_max_h(Hash_table * ht){
+	u_int max = 0;
+	u_int max_ip = 0;
+	int i;
+	for (i = 0; i < ht->n; ++i){
+		if ( (ht->table[i]).ip != 0){
+			if (ht->table[i].bytes_send > max){
+				max = ht->table[i].bytes_send;
+				max_ip = ht->table[i].ip;
+			}
+		}
+	}
+	printf("\nMost data send from ip: %s \t bytes send: %u\n", ip_to_string(max_ip), max);
+
+}
+
 void parse_packets(){
 
-	Hash_table * ht = init_hash_table(1000);
+	Hash_table * ht = init_hash_table(HT_SIZE);
 
 	Frame * f;
 	Item * curr;
 	curr = frames_ll->head;
 
+	// for each frame in linked list
 	while(curr) {		
-		f = curr->data; // frame struct
-		                
-		printf("eth type: %04x\n", get_eth_type( f->eth_header ));
-		if (  get_eth_type( f->eth_header ) == ARP_TYPE  ){
-			printf("arp\n");
-		} else {
-			f->network_header = f->data + 14;
-			printf("SRC IP address: %s\n", ip_to_string(IPv4->src_ip_addr));
-		}
+		// set current frame f
+		f = curr->data; 
 		
+		// if given frame is not ETH II, dont analyze it
+		if (! f->parseble){
+	    	curr = curr->next; 
+			continue;
+		}                
 
-		//printf("\t: %u bytes\n", );
-		//insert_h(ht, IPv4->src_ip_addr, 10);
+		// if we have IPv4
+		if (  get_eth_type( f->eth_header ) == IP4_TYPE  ){
+
+			f->network_header = f->data + 14;
+
+			insert_h(ht, IPv4->src_ip_addr, (f->length < 60)? 64 : f->length+4);
+		}
+
+		// if we have ARP
+		if (  get_eth_type( f->eth_header ) == ARP_TYPE  ){
+
+			//f->network_header = f->data + 14;
+
+			
+		}
 		
 	    curr = curr->next; // next item in LL
 	}
+	print_all_h(ht);
+	print_max_h(ht);
+	printf("Parsed %u frames :)\n", frames_ll->number_of_items);
 }

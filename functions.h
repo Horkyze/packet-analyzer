@@ -53,7 +53,7 @@ void dump(const unsigned char * p, int len){
 
 typedef struct LL {
 	void * head;
-	unsigned int number_of_items;
+	u_int number_of_items;
 
 }LL;
 
