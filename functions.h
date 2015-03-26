@@ -10,12 +10,22 @@ void print_hex(u_char * data, int len){
 	int i;
 	for (i = 0; i < len; ++i)
 	{
-		printf("%02x", data[i]);
+		printf("%02x ", data[i]);
 	}
 	printf("\n");
 }
 
-
+char * ip_to_string(u_int ip){
+	char * s;
+	s = (char *) malloc(20);
+    u_char bytes[4];
+    bytes[0] = ip & 0xFF;
+    bytes[1] = (ip >> 8) & 0xFF;
+    bytes[2] = (ip >> 16) & 0xFF;
+    bytes[3] = (ip >> 24) & 0xFF;	
+    sprintf(s, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);  
+    return s;      
+}
 
 
 void dump(const unsigned char * p, int len){

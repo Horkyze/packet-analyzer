@@ -121,7 +121,7 @@ void parse_eth(u_char * data, int length, int index){
 typedef struct Frame {
 	u_int number;
 	u_int length;
-	int parseble;
+	u_int parseble;
 
 	void * eth_header;
 	void * network_header;

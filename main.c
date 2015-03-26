@@ -4,7 +4,7 @@
 	Matej Bellus
 
 **/
-
+#pragma pack(1)
 
 #include <pcap.h>
 #include <arpa/inet.h>
@@ -17,6 +17,7 @@
 #include "functions.h"
 #include "hash_table.h"
 #include "eth_parser.h"
+#include "arp_parser.h"
 #include "ip_parser.h"
 
 
@@ -104,6 +105,9 @@ int main(int argc, char *argv[])
 
 	print_frames();
 	parse_packets();
+
+	find_arp_pairs();
+
 	
 	pcap_close(handle);
 	return(0);

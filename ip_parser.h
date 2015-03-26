@@ -23,32 +23,7 @@ typedef	struct ipv4_h
 
 }ipv4_h;
 
-#define ARP_REQUEST 1   /* ARP Request             */ 
-#define ARP_REPLY 2     /* ARP Reply               */ 
-typedef struct arp_h { 
-    u_int16_t htype;    /* Hardware Type           */ 
-    u_int16_t ptype;    /* Protocol Type           */ 
-    u_char hlen;        /* Hardware Address Length */ 
-    u_char plen;        /* Protocol Address Length */ 
-    u_int16_t oper;     /* Operation Code          */ 
-    u_char sha[6];      /* Sender hardware address */ 
-    u_int spa[4];      	/* Sender IP address       */ 
-    u_char tha[6];      /* Target hardware address */ 
-    u_int tpa[4];      	/* Target IP address       */ 
-}arp_h; 
 
-
-char * ip_to_string(u_int ip){
-	char * s;
-	s = (char *) malloc(20);
-    u_char bytes[4];
-    bytes[0] = ip & 0xFF;
-    bytes[1] = (ip >> 8) & 0xFF;
-    bytes[2] = (ip >> 16) & 0xFF;
-    bytes[3] = (ip >> 24) & 0xFF;	
-    sprintf(s, "%d.%d.%d.%d", bytes[0], bytes[1], bytes[2], bytes[3]);  
-    return s;      
-}
 
 // prints all ip addrs from hash table
 void print_all_h(Hash_table * ht){
@@ -107,8 +82,8 @@ void parse_packets(){
 		// if we have ARP
 		if (  get_eth_type( f->eth_header ) == ARP_TYPE  ){
 
-			//f->network_header = f->data + 14;
-
+			f->network_header = f->data + 14;
+			add_arp_frame(f);
 			
 		}
 		
@@ -116,5 +91,6 @@ void parse_packets(){
 	}
 	print_all_h(ht);
 	print_max_h(ht);
-	printf("Parsed %u frames :)\n", frames_ll->number_of_items);
+	printf("Parsed %u frames :)\n\n\n", frames_ll->number_of_items);
+
 }
